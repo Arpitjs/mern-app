@@ -6,6 +6,7 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 import { RollbackOutlined } from '@ant-design/icons'
 import Link from 'next/link'
+import setAvatar from '../../functions/index'
 
 const Following = () => {
     const [state, setState] = useContext(UserContext)
@@ -39,8 +40,6 @@ const Following = () => {
             toast.error(err.response.data.err.msg)
         }
     }
-
-    let setAvatar = user => user.image ? user.image.url : '/images/default.jpg'
 
     return (
         <div className="row col-md-6 offset-md-3">

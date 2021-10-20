@@ -2,35 +2,44 @@ import AuthRoute from '../../components/routes/AuthRoute'
 import { useContext, useState, useEffect } from "react"
 import { UserContext } from "../../context"
 import CreatePostForm from '../../components/Forms/CreatePostForm'
-import { useRouter } from 'next/router'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import PostList from '../../components/cards/PostList'
 import People from '../../components/cards/People'
 import Link from 'next/link'
+import { Pagination } from 'antd'
+import Search from '../../components/Search'
 
 const dashboard = () => {
-  let router = useRouter()
   let [posts, setPosts] = useState([])
   const [state, setState] = useContext(UserContext)
   let [content, setContent] = useState('')
   let [image, setImage] = useState({})
+  let [people, setPeople] = useState([])
   let [submitting, setSubmitting] = useState(false)
   let [loading, setLoading] = useState(false)
+  let [totalPosts, setTotalPosts] = useState(0)
+  let [page, setPage] = useState(1)
 
   useEffect(() => {
     try {
       if (state && state.token) {
         fetchUserPosts()
+        findPeople()
       }
     } catch (e) {
       toast(e.response.data)
     }
-  }, [state && state.token])
+  }, [state && state.token, page])
+
+  useEffect(async () => {
+     let { data } = await axios.get('/posts/total-posts')
+     setTotalPosts(data)
+  }, [])
 
   function fetchUserPosts() {
     try {
-      axios.get('posts/user-posts')
+      axios.get(`posts/user-posts?page=${page}`)
         .then(({ data }) => setPosts(data.posts))
     } catch (e) {
       // console.log(e)
@@ -43,6 +52,7 @@ const dashboard = () => {
     setSubmitting(true)
     try {
       await axios.post('posts/create-post', { content, image })
+      setPage(1)
       setSubmitting(false)
       setLoading(false)
       fetchUserPosts()
@@ -85,6 +95,17 @@ const dashboard = () => {
     }
   }
 
+  
+  function findPeople() {
+    try {
+      axios.get('users/find-people')
+        .then(({ data }) => setPeople(data.people))
+    } catch (e) {
+      // console.log(e)
+      toast.error(err.response.data.err.msg)
+    }
+  }
+
   return (
     <AuthRoute>
       <div className="container-fluid">
@@ -107,9 +128,17 @@ const dashboard = () => {
              fetchUserPosts={fetchUserPosts}
                 deletePost={deletePost}
             />
+            {/* 3 posts per page */}
+            <Pagination className="pb-5"
+            current={page} total={(totalPosts / 3 * 10)}
+            onChange={value => setPage(value)}
+            />
           </div>
+          
           {/* <pre>{JSON.stringify(posts, null, 4)}</pre> */}
           <div className="col-md-4">
+          <Search/>
+          <br />
           { state && state.user &&
              <Link href={'/user/following'}>
                <a className="h6">
@@ -117,6 +146,7 @@ const dashboard = () => {
             </Link>} <br/>
             <People 
             fetchUserPosts={fetchUserPosts}
+            people={people}
             />
           </div>
         </div>

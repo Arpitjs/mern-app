@@ -6,7 +6,7 @@ cloudinary.config({
     api_secret: process.env.CLOUD_API_SECRET
 })
 
-exports.uploadImage = async (req, res, next) => {
+uploadImage = async (req, res, next) => {
     // console.log('req files', req.files)
     try {
         cloudinary.uploader.upload(req.files.image.path)
@@ -17,4 +17,9 @@ exports.uploadImage = async (req, res, next) => {
     } catch (e) {
         next({ msg: e })
     }
+}
+let deleteImage = async image => await cloudinary.uploader.destroy(image.public_id)
+
+module.exports = {
+    uploadImage, deleteImage
 }

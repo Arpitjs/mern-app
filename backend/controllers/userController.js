@@ -92,3 +92,27 @@ exports.userFollowing = async (req, res, next) => {
         next({ msg: e })
     }
 }
+
+
+exports.searchUser = async (req, res, next) => {
+    let { query } = req.query
+    if(!query) return;
+    try {
+        // i is used to perform case insensetive matching
+        let searchResult = await User.find({ 
+            $or: [
+                {
+                    name: { $regex: query, $options: 'i'}
+                }, 
+                {
+                    username: { $regex: query, $options: 'i' }
+                }
+            ]
+         })
+         .select('_id name username image')
+        if(!searchResult.length) return res.status(400).json({ msg: 'No result found.'})
+        res.status(200).json(searchResult)
+    } catch (e) {
+        next({ msg: e })
+    }
+}

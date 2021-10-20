@@ -3,7 +3,7 @@ let router = new express.Router()
 let formidable = require('express-formidable')
 let authController = require('../controllers/authController')
 let userController = require('../controllers/userController')
-let { uploadImage } = require('../utils/uploadImage')
+let { uploadImage } = require('../utils/Image')
 
 router.get('/find-people', 
 authController.protect, userController.findPeople)
@@ -16,6 +16,9 @@ authController.protect, userController.follow)
 
 router.post('/unfollow', 
 authController.protect, userController.unfollow)
+ 
+router.get('/search', 
+authController.protect, userController.searchUser)
 
 router.post('/upload-image', authController.protect,
  formidable({ maxFileSize: '5 * 1024 * 1024'}), uploadImage)

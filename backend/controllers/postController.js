@@ -1,13 +1,39 @@
 let Post = require('../models/Post')
 let User = require('../models/User')
+let { deleteImage } = require('../utils/Image')
 
 exports.postByUser = async (req, res, next) => {
+    
     let user = await User.findById(req.user._id)
     let usersFollowing = user.following
+    let currentPage = req.query.page || 1
+    let perPage = 3
     let posts = await Post.find({ postedBy: { $in: [...usersFollowing, req.user._id] } })
-        .populate('postedBy', '_id name photo')
+
+        .skip((currentPage - 1) * perPage)
+        .limit(perPage)
+        .populate('postedBy', 'name photo')
+        .populate('comments.postedBy', 'name photo')
         .sort({ createdAt: -1 })
+
     res.status(200).json({ posts })
+}
+
+exports.getOnePost = async (req, res, next) => {
+    try {
+        let post = await Post.findById(req.params.id)
+            .populate('postedBy', 'name photo')
+            .populate('comments.postedBy', 'name photo')
+
+        res.status(200).json({ post })
+    } catch (e) {
+        next({ msg: e })
+    }
+}
+
+exports.totalPosts = async (req, res, next) => {
+    let total = await Post.estimatedDocumentCount()
+    res.status(200).json(total)
 }
 
 exports.createPost = async (req, res, next) => {
@@ -25,16 +51,13 @@ exports.createPost = async (req, res, next) => {
     res.status(200).json({ msg: 'post created.', newPost })
 }
 
-exports.getOnePost = async (req, res, next) => {
-    let post = await Post.findById(req.params.id)
-    res.status(200).json({ post })
-}
-
 exports.canEditDelete = async (req, res, next) => {
-    let post = await Post.findById(req.params.id)
-    if (post.postedBy.toString() !== req.user._id.toString()) return next({
-        msg: 'NOT Authorized', status: 401
-    })
+    try {
+        let post = await Post.findById(req.params.id)
+        if (post.postedBy.toString() !== req.user._id.toString()) return next({
+            msg: 'NOT Authorized', status: 401
+        })
+    } catch (e) { next({ msg: e }) }
     next()
 }
 
@@ -51,8 +74,7 @@ exports.deletePost = async (req, res, next) => {
     try {
         let post = await Post.findByIdAndDelete(req.params.id)
         if (post.image) {
-            await cloudinary
-                .uploader.destroy(post.image.public_id)
+            deleteImage(post.image)
         }
         res.status(200).json({ ok: true })
     } catch (e) {
@@ -84,6 +106,40 @@ exports.unlike = async (req, res, next) => {
             $inc: { noOfLikes: -1 }
         }, { new: true })
 
+        res.status(200).json({ post })
+    } catch (e) {
+        next({ msg: e })
+    }
+}
+
+exports.addComment = async (req, res, next) => {
+    try {
+        let post = await Post.findByIdAndUpdate(req.body.postId, {
+            $push: {
+                comments: {
+                    comment: req.body.comment,
+                    postedBy: req.user._id
+                }
+            }
+        }, { new: true })
+            .populate('postedBy', 'name photo')
+            .populate('comments.postedBy', 'name photo')
+
+        res.status(200).json({ post })
+    } catch (e) {
+        next({ msg: e })
+    }
+}
+
+exports.removeComment = async (req, res, next) => {
+    try {
+        let post = await Post.findByIdAndUpdate(req.params.postId, {
+            $pull: {
+                comments: {
+                    _id: req.params.id
+                }
+            }
+        }, { new: true })
         res.status(200).json({ post })
     } catch (e) {
         next({ msg: e })

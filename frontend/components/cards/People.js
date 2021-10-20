@@ -1,35 +1,12 @@
-import { useContext, useEffect, useState } from "react"
+import { useContext } from "react"
 import { Avatar, List } from "antd"
-import { useRouter } from "next/router"
 import { UserContext } from "../../context"
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import setAvatar from '../../functions/index'
 
-const People = ({ fetchUserPosts }) => {
+const People = ({ people, fetchUserPosts, handleFollow, handleUnfollow }) => {
   const [state, setState] = useContext(UserContext)
-  let [people, setPeople] = useState([])
-  const router = useRouter()
-
-  useEffect(() => {
-    try {
-      if (state && state.token) {
-        findPeople()
-      }
-    } catch (e) {
-      console.log(e)
-      toast(e.response.data.err.msg)
-    }
-  }, [state && state.token])
-
-  function findPeople() {
-    try {
-      axios.get('users/find-people')
-        .then(({ data }) => setPeople(data.people))
-    } catch (e) {
-      // console.log(e)
-      toast.error(err.response.data.err.msg)
-    }
-  }
 
   function followUsers(user) {
     try {
@@ -50,20 +27,21 @@ const People = ({ fetchUserPosts }) => {
     }
   }
 
-  let setAvatar = user => user.photo ? user.photo.url : '/images/default.jpg'
   return (
     <>
       <List
         itemLayout="horizontal"
-        dataSource={people}
+      dataSource={people}
         renderItem={(user) => (
           <List.Item>
             <List.Item.Meta
               avatar={<Avatar src={setAvatar(user)} />}
               title={
                 <div className="d-flex justify-content-between">
-                  {user.username} <span
-                    className="text-primary pointer" onClick={() => followUsers(user)}>Follow</span>
+                  {user.username}
+                   <span
+                    className="text-primary pointer" 
+                    onClick={() => followUsers(user)}>Follow</span>
                 </div>
               }
             />

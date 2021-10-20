@@ -23,7 +23,7 @@ const Login = () => {
                 setState({ user: data.user, token: data.token })
                 //set in local storage
                 localStorage.setItem('auth', JSON.stringify(data))
-                router.push('/')
+                router.push('/user/dashboard')
             })
             .catch(err => {
                 // console.log(err.response)
@@ -31,7 +31,7 @@ const Login = () => {
                 toast.error(err.response.data.err.msg)
             })
     }
-    if(state && state.token) router.push('/')
+    if(state && state.token) router.push('/user/dashboard')
     return (
         <div className="container-fluid">
             <div className="row py-5 bg-secondary text-light">

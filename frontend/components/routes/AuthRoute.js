@@ -13,6 +13,7 @@ const UserRoute = ({ children }) => {
     if (state && state.token) getCurrentUser()
   }, [state && state.token])
 
+  //check if user is authorized or not
   const getCurrentUser = async () => {
     try {
      await axios.get('auth/current-user')
@@ -21,7 +22,7 @@ const UserRoute = ({ children }) => {
       router.push("/Login")
     }
   }
-
+//if no token, user gets redirected to login page
   process.browser &&
     state === null &&
     setTimeout(() => {

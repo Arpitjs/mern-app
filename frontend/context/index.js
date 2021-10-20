@@ -13,10 +13,12 @@ let UserProvider = ({ children }) => {
         token: ""
     })
 
+    //to set the user and token 
     useEffect(() => {
         setState(JSON.parse(localStorage.getItem('auth')))
     }, [])
 
+    //for backend
     // set tokens and base url in the context
     let token = state && state.token ? state.token : ''
     axios.defaults.baseURL = process.env.NEXT_PUBLIC_API
@@ -41,3 +43,5 @@ let UserProvider = ({ children }) => {
 }
 
 export { UserContext, UserProvider }
+
+// context used to update the state of the app
