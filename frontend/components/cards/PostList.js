@@ -40,8 +40,17 @@ const PostList = ({ posts, deletePost, fetchUserPosts }) => {
       toast.error(err.response.data.err.msg)
     }
   }
-  let removeComment = async () => {
-
+  let removeComment = async (postId, toDel) => {
+    try {
+      let areYouSure = confirm('are you sure want to delete?')
+      if (!areYouSure) return;
+      await axios.delete(`/posts/remove-comment/${postId}/${toDel._id}`)
+      toast.error('comment deleted!')
+      fetchUserPosts()
+  } catch (err) {
+      console.log(err)
+      toast.error(err.response.data.err.msg)
+  }
   }
   return (
     <>

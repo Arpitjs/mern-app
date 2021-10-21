@@ -2,6 +2,19 @@ let Post = require('../models/Post')
 let User = require('../models/User')
 let { deleteImage } = require('../utils/Image')
 
+exports.posts = async (req, res, next) => {
+    try {
+        let posts = await Post.find()
+        .sort({ createdAt: -1 })
+        .limit(3)
+        .populate('postedBy', 'name photo')
+        .populate('comments.postedBy', 'name photo')
+        res.status(200).json(posts)
+    } catch (e) {
+        next({ msg: e })
+    }
+}
+
 exports.postByUser = async (req, res, next) => {
     
     let user = await User.findById(req.user._id)

@@ -4,14 +4,14 @@ import { Avatar } from "antd"
 import PostImage from "../images/PostImage"
 import { HeartOutlined, HeartFilled, CommentOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons"
 import { UserContext } from '../../context/index'
-import { useContext, useState } from 'react'
+import { useContext } from 'react'
 import { useRouter } from 'next/router'
 import { Modal } from 'antd'
 import Link from 'next/link'
 import setAvatar from '../../functions/index'
 
-const Post = ({ post, deletePost, visible, setVisible, comment, setComment,
-    likePost, unlikePost, handleComment, addComment, deleteComment, commentsCount = 2
+const Post = ({ post, deletePost, visible, setVisible, comment, setComment, isHome,
+    likePost, unlikePost, handleComment, addComment, removeComment, commentsCount = 2
 }) => {
   let router = useRouter()
   let [state] = useContext(UserContext)
@@ -71,7 +71,7 @@ const Post = ({ post, deletePost, visible, setVisible, comment, setComment,
                   </form>
                 </Modal>
 
-                {state && state.user && state.user._id === post.postedBy._id && <>
+                {state && state.user && state.user._id === post.postedBy._id && !isHome && <>
                   <EditOutlined className="text-danger pt-2 h5 px-2 mx-auto"
                     onClick={() => router.push(`/user/post/${post._id}`)}
                   />
@@ -84,7 +84,7 @@ const Post = ({ post, deletePost, visible, setVisible, comment, setComment,
                 </>}
               </div>
             </div>
-            {post.comments && post.comments.length ?
+            {post.comments && post.comments.length && !isHome ?
               <ol className="list-group" 
               style={{maxHeight: '125px', overflow: 'scroll'}}
               >
@@ -108,7 +108,7 @@ const Post = ({ post, deletePost, visible, setVisible, comment, setComment,
                     </span>
                    {state && state.user && state.user._id === comment.postedBy._id && <>
                     <DeleteOutlined className="text-danger pt-2 h5 px-2"
-                    onClick={() => deleteComment(post._id, comment)}/>
+                    onClick={() => removeComment(post._id, comment)}/>
                     </>}
                    
                   </li>

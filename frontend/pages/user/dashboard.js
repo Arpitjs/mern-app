@@ -106,6 +106,27 @@ const dashboard = () => {
     }
   }
 
+  
+  function followUsers(user) {
+    try {
+      axios.post('users/follow', user)
+        .then(({ data }) => {
+          toast.success(`you are now following ${user.name}`)
+          let auth = JSON.parse(localStorage.getItem('auth'))
+          auth.user = data.user
+          localStorage.setItem('auth', JSON.stringify(auth))
+          setState({ ...state, user: data.user })
+          setPeople(people.filter(p => p._id !== user._id))
+          //re-render the posts, of the followed users
+          fetchUserPosts()
+        })
+    } catch (e) {
+      // console.log(e)
+      toast.error(err.response.data.err.msg)
+    }
+  }
+
+
   return (
     <AuthRoute>
       <div className="container-fluid">
@@ -130,7 +151,7 @@ const dashboard = () => {
             />
             {/* 3 posts per page */}
             <Pagination className="pb-5"
-            current={page} total={(totalPosts / 3 * 10)}
+            current={page} total={(totalPosts / 3) * 10}
             onChange={value => setPage(value)}
             />
           </div>
@@ -147,6 +168,7 @@ const dashboard = () => {
             <People 
             fetchUserPosts={fetchUserPosts}
             people={people}
+            handleFollow={followUsers}
             />
           </div>
         </div>

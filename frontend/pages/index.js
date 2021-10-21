@@ -1,16 +1,61 @@
-import React from 'react'
+import axios from 'axios'
+import Post from '../components/cards/Post'
+import Head from 'next/head'
+import Link from 'next/link'
 
-const Home = () => {
+const Home = ({ posts }) => {
+    let head = () => (
+        <Head>
+            <title>Merncamp -- A social network</title>
+            <meta name="description" 
+            content="social network"/>
+            <meta property="og:description"
+            content="social network"/>
+            <meta property="og:type" content="website"/>
+            <meta property="og:site_name" content="MERNCAMP"/>
+            <meta property="og:url" content="localhost:3000"/>
+            <meta property="og:image:secure_url" 
+            content="http://merncamp.com/images/default.jpg"/>
+        </Head>
+    )
     return (
+        <>
+        {head()}
+        <div className="container-fluid"
+        style={{
+            backgroundImage: "url( "+ "/images/default.jpg"+ ")",
+            backgroundAttachment: "fixed",
+            padding: "100px 0px 75px 0px",
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            display: 'block'
+        }}>
+                <h1 className="display-1 font-weight-bold text-center py-5">MERNCAMP</h1>
+        </div>
         <div className="container">
-            <div className="row">
-                <div className="col">
-                <h1 className="display-1 text-center py-5">Home page</h1>
-                <img src="/images/default.jpg" alt="image"/>
-                </div>
+            <div className="row pt-5">
+          { posts.map(post => (
+          <div className="col-md-4">
+                <Link href={`/post/view/${post._id}`}>
+              <a><Post key={post._id} post={post} isHome={true}/></a>
+            </Link>
+          </div>
+          ))}  
             </div>
         </div>
+          </>    
     )
+}
+
+//SSR ma backend bata data ae pachi only the client is loaded,
+// but in use effect, first client loads, then calls BE, then re renders the contents
+
+export async function getServerSideProps() {
+    let { data } = await axios.get('/posts/posts')
+    return {
+        props: { posts: data }
+    }
 }
 
 export default Home

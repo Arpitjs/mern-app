@@ -2,6 +2,16 @@ let User = require('../models/User')
 let mapUser = require('../utils/mapUser')
 let { validateUpdate } = require('../utils/validateUser')
 
+exports.fetchUser = async (req, res, next) => {
+    try {
+        let user = await User.findOne({ username: req.params.username })
+        .select('-password -secret')
+        res.status(200).json({ user })
+    } catch (e) {
+        next({ msg: e })
+    }
+}
+
 exports.updateProfile = async (req, res, next) => {
     try {
         let toUpdate = {}
@@ -109,7 +119,7 @@ exports.searchUser = async (req, res, next) => {
                 }
             ]
          })
-         .select('_id name username image')
+         .select('-password -secret')
         if(!searchResult.length) return res.status(400).json({ msg: 'No result found.'})
         res.status(200).json(searchResult)
     } catch (e) {
