@@ -1,9 +1,24 @@
 import axios from 'axios'
-import Post from '../components/cards/Post'
+import PostPublic from '../components/cards/PostPublic'
 import Head from 'next/head'
 import Link from 'next/link'
+import io from 'socket.io-client'
+import { useState, useEffect } from "react"
+
+let socket = io(process.env.NEXT_PUBLIC_SOCKETIO, {path: '/socket.io'}, {
+  reconnection: true
+})
 
 const Home = ({ posts }) => {
+  let [newsFeed, setNewsFeed] = useState([])
+ 
+  useEffect(() => {
+    socket.on('send post', post => setNewsFeed([post, ...posts]))
+    socket.on('deleted', () => setNewsFeed([...posts]))
+  }, [])
+
+  let data = newsFeed.length ? newsFeed : posts
+
     let head = () => (
         <Head>
             <title>Merncamp -- A social network</title>
@@ -34,16 +49,17 @@ const Home = ({ posts }) => {
                 <h1 className="display-1 font-weight-bold text-center py-5">MERNCAMP</h1>
         </div>
         <div className="container">
-            <div className="row pt-5">
-          { posts.map(post => (
-          <div className="col-md-4">
-                <Link href={`/post/view/${post._id}`}>
-              <a><Post key={post._id} post={post} isHome={true}/></a>
-            </Link>
-          </div>
-          ))}  
+        <div className="row pt-5">
+          {data.map(post => (
+            <div key={post._id} className="col-md-4">
+              <Link href={`/post/view/${post._id}`}><a>
+                  <PostPublic key={post._id} post={post}/>
+                  </a>
+                  </Link>
             </div>
+          ))}
         </div>
+      </div>
           </>    
     )
 }

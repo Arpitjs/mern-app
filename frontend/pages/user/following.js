@@ -61,9 +61,7 @@ const Following = () => {
                 )}
             />
 
-            <Link href="/user/dashboard">
-                <a><RollbackOutlined /></a>
-            </Link>
+            <Link href="/user/dashboard"><a><RollbackOutlined /></a></Link>
         </div>
     )
 }

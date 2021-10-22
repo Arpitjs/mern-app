@@ -7,7 +7,7 @@ import Post from '../../components/cards/Post'
 import Link from 'next/link'
 import { RollbackOutlined } from '@ant-design/icons'
 
-let PostComments = () => {
+let PostComments = (isHome) => {
     let router = useRouter()
     let id = router.query._id
     let [post, setPost] = useState({})
@@ -89,33 +89,39 @@ let PostComments = () => {
 
     return (
         <AuthRoute>
-            <div className="container-fluid">
-                <div className="row py-5 bg-default-image text-light">
-                    <div className="col text-center">
-                        <h1>MERNCAMP</h1>
-                    </div>
-                </div>
-                <div className="container col-md-8 offset-md-2 pt-5">
-                    <Post
-                        post={post}
-                        likePost={likePost}
-                        unlikePost={unlikePost}
-                        handleComment={handleComment}
-                        comment={comment}
-                        addComment={addComment}
-                        setComment={setComment}
-                        deleteComment={deleteComment}
-                        deletePost={deletePost}
-                        visible={visible}
-                        setVisible={setVisible}
-                        commentsCount={100}
-                    />
-                </div>
-        
-                <Link href="/user/dashboard">
-                <a className="d-flex justify-content-center p-5"><RollbackOutlined /></a>
-            </Link>
+            <div className="container-fluid"
+                style={{
+                    backgroundImage: "url( " + "/images/default.jpg" + ")",
+                    backgroundAttachment: "fixed",
+                    padding: "100px 0px 75px 0px",
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center center',
+                    display: 'block'
+                }}>
+                <h1 className="display-1 font-weight-bold text-center py-5">MERNCAMP</h1>
             </div>
+            <div className="container col-md-8 offset-md-2 pt-5">
+                <Post
+                    post={post}
+                    likePost={likePost}
+                    unlikePost={unlikePost}
+                    handleComment={handleComment}
+                    comment={comment}
+                    addComment={addComment}
+                    setComment={setComment}
+                    deleteComment={deleteComment}
+                    deletePost={deletePost}
+                    visible={visible}
+                    setVisible={setVisible}
+                    commentsCount={100}
+                    isHome={true}
+                />
+            </div>
+
+            <Link href="/user/dashboard">
+                <a className="d-flex justify-content-center"><RollbackOutlined /></a>
+            </Link>
         </AuthRoute>
 
     )

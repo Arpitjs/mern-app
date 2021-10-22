@@ -27,6 +27,11 @@ let userSchema = new mongoose.Schema({
         lowercase: true
     }, 
     about: {},
+    role: {
+        type: String,
+        enum: ['Subscriber', 'Admin'],
+        default: 'Subscriber'
+    },
     photo: {
         url: String,
         public_id: String

@@ -11,7 +11,7 @@ import Link from 'next/link'
 import setAvatar from '../../functions/index'
 
 const Post = ({ post, deletePost, visible, setVisible, comment, setComment, isHome,
-    likePost, unlikePost, handleComment, addComment, removeComment, commentsCount = 2
+    likePost, unlikePost, handleComment, addComment, deleteComment, commentsCount = 2
 }) => {
   let router = useRouter()
   let [state] = useContext(UserContext)
@@ -46,19 +46,16 @@ const Post = ({ post, deletePost, visible, setVisible, comment, setComment, isHo
                   {post.noOfLikes ? post.noOfLikes : 0} Likes
                 </div>
 
-                <CommentOutlined onClick={() => handleComment()}
+                <CommentOutlined onClick={() => handleComment(post)}
                   className="text-danger pt-2 h5 px-5" />
                 <div className="pt-2 pl-3">
-                  <Link href={`/post/${post._id}`}>
-                    <a>{post.comments.length} comments</a>
-                  </Link>
-                </div>
-
+                  <Link href={`/post/${post._id}`}><a> {post.comments.length} comments</a></Link>
+                </div> 
                 <Modal visible={visible}
                   onCancel={() => setVisible(false)}
                   title="Comment" footer={null}
                 >
-                  <form onSubmit={(e) => addComment(e, post._id)}>
+                  <form onSubmit={(e) => addComment(e)}>
                     <input type="text" placeholder="write something.."
                       className="form-control"
                       value={comment}
@@ -71,7 +68,7 @@ const Post = ({ post, deletePost, visible, setVisible, comment, setComment, isHo
                   </form>
                 </Modal>
 
-                {state && state.user && state.user._id === post.postedBy._id && !isHome && <>
+                {state && state.user && ( state.user.role === 'Admin' || state.user._id === post.postedBy._id ) && <>
                   <EditOutlined className="text-danger pt-2 h5 px-2 mx-auto"
                     onClick={() => router.push(`/user/post/${post._id}`)}
                   />
@@ -84,10 +81,8 @@ const Post = ({ post, deletePost, visible, setVisible, comment, setComment, isHo
                 </>}
               </div>
             </div>
-            {post.comments && post.comments.length && !isHome ?
-              <ol className="list-group" 
-              style={{maxHeight: '125px', overflow: 'scroll'}}
-              >
+            {post.comments && post.comments.length ?
+              <ol className="list-group">
                 {post.comments.slice(0, commentsCount).map(comment => (
                   <li 
                   key={comment._id}
@@ -106,11 +101,10 @@ const Post = ({ post, deletePost, visible, setVisible, comment, setComment, isHo
                     <span className="badge rounded-pill text-muted">
                       {moment(comment.created).fromNow()}
                     </span>
-                   {state && state.user && state.user._id === comment.postedBy._id && <>
-                    <DeleteOutlined className="text-danger pt-2 h5 px-2"
-                    onClick={() => removeComment(post._id, comment)}/>
-                    </>}
-                   
+                   { state && state.user && ( state.user.role === 'Admin' || state.user._id === comment.postedBy._id ) && <>
+                <DeleteOutlined className="text-danger pt-2 h5 px-2" 
+                    onClick={() => deleteComment(post._id, comment)}/>
+                    </> }
                   </li>
                 ))
                 }

@@ -48,8 +48,7 @@ const Username = () => {
                    </span>
                    </div>  
             </Card>
-            <Link href="/user/dashboard">
-                <a><RollbackOutlined /></a>
+            <Link href="/user/dashboard"><a><RollbackOutlined /></a>
             </Link>
           </div>
         </div>

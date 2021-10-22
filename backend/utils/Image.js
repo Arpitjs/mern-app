@@ -18,7 +18,13 @@ uploadImage = async (req, res, next) => {
         next({ msg: e })
     }
 }
-let deleteImage = async image => await cloudinary.uploader.destroy(image.public_id)
+let deleteImage = async image => {
+    try {
+        await cloudinary.uploader.destroy(image.public_id)
+    } catch (e) {
+        console.log(e)
+    }
+}
 
 module.exports = {
     uploadImage, deleteImage

@@ -66,18 +66,14 @@ const Register = () => {
                         title="Congrats!" visible={ok} onCancel={() => setOk(false)}
                         footer={null}>
                         <p>you have successfully registered.</p>
-                        <Link href="/Login">
-                            <a className="btn btn-primary btn-sm">Login</a>
-                        </Link>
+                        <Link href="/Login"><a className="btn btn-primary btn-sm">Login</a></Link>
                     </Modal>
                 </div>
             </div>
             <div className="row">
                 <div className="col">
                     <p className="text-center">Already register? 
-                    <Link href="/Login">
-                            <a> Login</a>
-                        </Link>
+                    <Link href="/Login"><a> Login</a></Link>
                     </p>
                     </div>
                 </div>

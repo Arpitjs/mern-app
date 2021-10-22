@@ -55,18 +55,14 @@ const Login = () => {
             <div className="row">
                 <div className="col">
                     <p className="text-center">Not registered yet?
-                        <Link href="/Register">
-                            <a> Register</a>
-                        </Link>
+                        <Link href="/Register"><a> Register</a></Link>
                     </p>
                 </div>
             </div>
             <div className="row">
                 <div className="col">
                 <p className="text-center">
-                        <Link href="/forgot-password">
-                            <a className="text-danger"> Forgot Password</a>
-                        </Link>
+                        <Link href="/forgot-password"><a className="text-danger"> Forgot Password</a></Link>
                     </p>
                 </div>
             </div>

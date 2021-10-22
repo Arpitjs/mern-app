@@ -67,3 +67,11 @@ exports.resetPassword = async(req, res, next) => {
     await user.save()
     res.status(200).json({msg: 'reset done!'})
 }
+
+exports.isAdmin = async (req, res, next) => {
+    let user = await User.findById(req.user._id)
+    if(user.role === 'Admin') {
+        req.admin = true
+    }
+    next()
+}

@@ -9,6 +9,11 @@ import People from '../../components/cards/People'
 import Link from 'next/link'
 import { Pagination } from 'antd'
 import Search from '../../components/Search'
+import io from 'socket.io-client'
+
+let socket = io(process.env.NEXT_PUBLIC_SOCKETIO, {path: '/socket.io'}, {
+  reconnection: true
+})
 
 const dashboard = () => {
   let [posts, setPosts] = useState([])
@@ -28,10 +33,16 @@ const dashboard = () => {
         findPeople()
       }
     } catch (e) {
+      console.log(err)
       toast(e.response.data)
     }
   }, [state && state.token, page])
 
+  useEffect(() => {
+    socket.on('returned', () => fetchUserPosts())
+    socket.on('deleted', () => fetchUserPosts())
+  }, [])
+  
   useEffect(async () => {
      let { data } = await axios.get('/posts/total-posts')
      setTotalPosts(data)
@@ -51,7 +62,7 @@ const dashboard = () => {
     e.preventDefault()
     setSubmitting(true)
     try {
-      await axios.post('posts/create-post', { content, image })
+      let { data } = await axios.post('posts/create-post', { content, image })
       setPage(1)
       setSubmitting(false)
       setLoading(false)
@@ -59,9 +70,11 @@ const dashboard = () => {
       setContent("")
       setImage({})
       toast.success('post created!')
+      socket.emit('new post', data.postWithUser)
+      socket.emit('from dashboard', {})
     } catch (err) {
       setSubmitting(false)
-      // console.log('ERR', err)
+      console.log('ERR', err)
       toast.error(err.response.data.err.msg)
     }
   }
@@ -85,6 +98,7 @@ const dashboard = () => {
     try {
       let areYouSure = confirm('are you sure want to delete?')
       if (!areYouSure) return;
+      socket.emit('delete post')
       await axios.delete(`/posts/delete-post/${toDel._id}`)
        let filteredPosts = posts.filter(p => p._id !== toDel._id)
       setPosts(filteredPosts)
@@ -95,7 +109,6 @@ const dashboard = () => {
     }
   }
 
-  
   function findPeople() {
     try {
       axios.get('users/find-people')
@@ -161,10 +174,9 @@ const dashboard = () => {
           <Search/>
           <br />
           { state && state.user &&
-             <Link href={'/user/following'}>
-               <a className="h6">
-                 {state.user.following && state.user.following.length}  Following</a>
-            </Link>} <br/>
+             <Link href={'/user/following'}><a className="h6">
+                 {state.user.following && state.user.following.length}  Following</a></Link>} 
+            <br/>
             <People 
             fetchUserPosts={fetchUserPosts}
             people={people}

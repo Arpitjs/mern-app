@@ -5,6 +5,7 @@ import Post from '../../components/cards/Post'
 
 const PostList = ({ posts, deletePost, fetchUserPosts }) => {
   let [comment, setComment] = useState('')
+  let [currentPost, setCurrentPost] = useState({})
   let [visible, setVisible] = useState(false)
 
   let likePost = async (post) => {
@@ -16,7 +17,7 @@ const PostList = ({ posts, deletePost, fetchUserPosts }) => {
     }
   }
 
-  let unlikePost = async (post) => {
+  let unlikePost = async post => {
     try {
       await axios.post('/posts/unlike', { post })
       fetchUserPosts()
@@ -26,12 +27,15 @@ const PostList = ({ posts, deletePost, fetchUserPosts }) => {
   }
 
 
-  let handleComment = () => setVisible(true)
+  let handleComment = post => {
+    setCurrentPost(post)
+    setVisible(true)
+  }
 
-  let addComment = async (e, postId) => {
+  let addComment = async (e) => {
     e.preventDefault()
     try {
-      await axios.post('/posts/add-comment', { postId, comment })
+      await axios.post('/posts/add-comment', { postId: currentPost._id, comment })
       toast.success('your comment is added.')
       setVisible(false)
       fetchUserPosts()
@@ -40,6 +44,7 @@ const PostList = ({ posts, deletePost, fetchUserPosts }) => {
       toast.error(err.response.data.err.msg)
     }
   }
+
   let removeComment = async (postId, toDel) => {
     try {
       let areYouSure = confirm('are you sure want to delete?')
@@ -47,28 +52,29 @@ const PostList = ({ posts, deletePost, fetchUserPosts }) => {
       await axios.delete(`/posts/remove-comment/${postId}/${toDel._id}`)
       toast.error('comment deleted!')
       fetchUserPosts()
-  } catch (err) {
+    } catch (err) {
       console.log(err)
       toast.error(err.response.data.err.msg)
+    }
   }
-  }
+
   return (
     <>
       {posts.length ?
         posts.map(post => (
-         <Post
-         key={post._id}
-          post={post}
-          likePost={likePost}
-          unlikePost={unlikePost}
-          handleComment={handleComment}
-          comment={comment}
-          setComment={setComment}
-          addComment={addComment}
-          removeComment={removeComment}
-          deletePost={deletePost}
-          visible={visible}
-          setVisible={setVisible}
+          <Post
+            key={post._id}
+            post={post}
+            likePost={likePost}
+            unlikePost={unlikePost}
+            handleComment={handleComment}
+            comment={comment}
+            setComment={setComment}
+            addComment={addComment}
+            deletePost={deletePost}
+            visible={visible}
+            setVisible={setVisible}
+            deleteComment={removeComment}
           />
         )) : <h3>No posts yet!</h3>}
     </>

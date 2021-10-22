@@ -5,7 +5,7 @@ let authController = require('../controllers/authController')
 let postController = require('../controllers/postController')
 let { uploadImage } = require('../utils/Image')
 
-router.get('/user-posts', authController.protect, postController.postByUser)
+router.get('/user-posts', authController.protect, authController.isAdmin, postController.postByUser)
 
 router.get('/user-post/:id', authController.protect, postController.getOnePost)
 

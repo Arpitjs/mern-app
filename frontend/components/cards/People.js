@@ -18,9 +18,7 @@ const People = ({ people, handleFollow, handleUnfollow }) => {
               avatar={<Avatar src={setAvatar(user)} />}
               title={
                 <div className="d-flex justify-content-between">
-                  <Link href={`/user/${user.username}`}>
-                  <a>{user.username}</a>
-                  </Link>
+                  <Link href={`/user/${user.username}`}><a>{user.username}</a></Link>
                  
                   {/* <pre>{JSON.stringify(user, null, 4)}</pre> */}
                 {state && state.user && user.followers && user.followers.includes(state.user._id) ?
